@@ -1,0 +1,169 @@
+{% extends 'detection/base.html' %}
+{% load static %}
+
+{% block title %}Home | Vehicle Detection & Tracking System{% endblock %}
+
+{% block content %}
+<section class="hero-section">
+  <div class="hero-badge">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3z"/></svg>
+    B.Tech Computer Vision & Deep Learning Project
+  </div>
+  
+  <h1 class="hero-title">
+    Vehicle Detection & <span>ByteTrack Tracking System</span>
+  </h1>
+  
+  <p class="hero-description">
+    An advanced academic web application that detects, tracks, and counts multi-class vehicles from traffic surveillance videos using <strong>YOLOv8s</strong> deep learning model, <strong>ByteTrack algorithm</strong>, and <strong>OpenCV</strong> frame processing without duplicate counts.
+  </p>
+
+  <div class="hero-cta">
+    {% if user.is_authenticated %}
+      <a href="{% url 'upload' %}" class="btn btn-primary btn-lg" id="homeStartDetectionBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        Start Video Upload
+      </a>
+      <a href="{% url 'live_tracker' %}" class="btn btn-secondary btn-lg" id="homeLiveWebcamBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+        Live Webcam Mode
+      </a>
+      <a href="{% url 'dashboard' %}" class="btn btn-secondary btn-lg" id="homeDashboardBtn">
+        Go to Dashboard
+      </a>
+    {% else %}
+      <a href="{% url 'login' %}" class="btn btn-primary btn-lg" id="homeLoginBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><polyline points="10 17 15 12 10 7"></polyline><line x1="15" y1="12" x2="3" y2="12"></line></svg>
+        Sign In to Start
+      </a>
+      <a href="{% url 'register' %}" class="btn btn-secondary btn-lg" id="homeRegisterBtn">
+        Create Account
+      </a>
+      <a href="{% url 'about' %}" class="btn btn-secondary btn-lg" id="homeAboutBtn">
+        Project Technical Docs
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+<!-- Stats Grid -->
+<div class="stats-grid">
+  <div class="metric-card" style="--card-color: var(--accent-cyan);">
+    <div class="metric-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
+    </div>
+    <div>
+      <div class="metric-val">{{ total_processed }}</div>
+      <div class="metric-label">Processed Videos</div>
+    </div>
+  </div>
+
+  <div class="metric-card" style="--card-color: var(--accent-emerald);">
+    <div class="metric-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.0 10.9 2 11.1 2 11.3V16c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>
+    </div>
+    <div>
+      <div class="metric-val">{{ overall_vehicles }}</div>
+      <div class="metric-label">Vehicles Counted</div>
+    </div>
+  </div>
+
+  <div class="metric-card" style="--card-color: var(--accent-purple);">
+    <div class="metric-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+    </div>
+    <div>
+      <div class="metric-val">4</div>
+      <div class="metric-label">Supported Classes</div>
+    </div>
+  </div>
+
+  <div class="metric-card" style="--card-color: var(--accent-amber);">
+    <div class="metric-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+    </div>
+    <div>
+      <div class="metric-val">YOLOv8s</div>
+      <div class="metric-label">Inference Model</div>
+    </div>
+  </div>
+</div>
+
+<!-- Architecture Features Cards -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+  <div class="glass-card">
+    <div style="color: var(--accent-cyan); margin-bottom: 1rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a7 7 0 1 0 10 10"></path></svg>
+    </div>
+    <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; color: #fff;">1. YOLOv8 Detection</h3>
+    <p style="color: #94a3b8; font-size: 0.95rem;">
+      Utilizes pre-trained <strong>yolov8s.pt</strong> neural network architecture to perform high-speed bounding box estimation on road vehicle classes: <em>Car (ID:2), Motorcycle (ID:3), Bus (ID:5), Truck (ID:7)</em>.
+    </p>
+  </div>
+
+  <div class="glass-card">
+    <div style="color: var(--accent-emerald); margin-bottom: 1rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+    </div>
+    <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; color: #fff;">2. ByteTrack Object Tracking</h3>
+    <p style="color: #94a3b8; font-size: 0.95rem;">
+      Integrates ByteTrack multi-object tracking to associate detections across consecutive frames, maintaining unique track IDs even during occlusion, camera jitter, or temporary visual obstacles.
+    </p>
+  </div>
+
+  <div class="glass-card">
+    <div style="color: var(--accent-purple); margin-bottom: 1rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+    </div>
+    <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem; color: #fff;">3. Duplicate Prevention</h3>
+    <p style="color: #94a3b8; font-size: 0.95rem;">
+      Ensures strict mathematical accuracy by indexing <code>(vehicle_class, track_id)</code> pairs per video session. A vehicle passing through 300 frames is counted exactly <strong>ONCE</strong>, not 300 times.
+    </p>
+  </div>
+</div>
+
+{% if recent_videos %}
+<div class="glass-card" style="margin-top: 2.5rem;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <h2 class="section-title" style="font-size: 1.5rem;">Recent Traffic Video Analyses</h2>
+    <a href="{% url 'history' %}" class="btn btn-secondary">View All Archive</a>
+  </div>
+
+  <div class="table-container">
+    <table class="custom-table">
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Cars</th>
+          <th>Buses</th>
+          <th>Trucks</th>
+          <th>Motorcycles</th>
+          <th>Total</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for vid in recent_videos %}
+        <tr>
+          <td>
+            <strong>{{ vid.title }}</strong><br>
+            <small style="color: #64748b;">{{ vid.created_at|date:"M d, Y - H:i" }}</small>
+          </td>
+          <td style="color: var(--color-car); font-weight: 700; font-family: var(--font-mono);">{{ vid.car_count }}</td>
+          <td style="color: var(--color-bus); font-weight: 700; font-family: var(--font-mono);">{{ vid.bus_count }}</td>
+          <td style="color: var(--color-truck); font-weight: 700; font-family: var(--font-mono);">{{ vid.truck_count }}</td>
+          <td style="color: var(--color-motorcycle); font-weight: 700; font-family: var(--font-mono);">{{ vid.motorcycle_count }}</td>
+          <td style="color: #fff; font-weight: 800; font-family: var(--font-mono);">{{ vid.overall_count }}</td>
+          <td><span class="badge badge-completed">{{ vid.get_status_display }}</span></td>
+          <td>
+            <a href="{% url 'results' pk=vid.pk %}" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.85rem;">View Results</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

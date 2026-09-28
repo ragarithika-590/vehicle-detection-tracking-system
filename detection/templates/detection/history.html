@@ -1,0 +1,86 @@
+{% extends 'detection/base.html' %}
+{% load static %}
+
+{% block title %}Video Archive & History | Vehicle Detection System{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+  
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+    <div>
+      <h1 class="section-title">Video Analysis Archive</h1>
+      <p class="section-subtitle">View past traffic detection sessions, metrics, and annotated videos.</p>
+    </div>
+
+    <form method="get" style="display: flex; gap: 0.5rem; width: 100%; max-width: 380px;">
+      <input type="text" name="q" value="{{ query }}" placeholder="Search by video title..." class="form-control" id="historySearchInput">
+      <button type="submit" class="btn btn-secondary">Search</button>
+    </form>
+  </div>
+
+  <div class="glass-card">
+    {% if videos %}
+      <div class="table-container">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Title / File</th>
+              <th>Cars</th>
+              <th>Buses</th>
+              <th>Trucks</th>
+              <th>Motors</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for vid in videos %}
+            <tr>
+              <td>
+                <strong style="color: #fff;">{{ vid.title }}</strong><br>
+                <small style="color: #64748b;">{{ vid.filename }}</small>
+              </td>
+              <td style="color: var(--color-car); font-weight: 700; font-family: var(--font-mono);">{{ vid.car_count }}</td>
+              <td style="color: var(--color-bus); font-weight: 700; font-family: var(--font-mono);">{{ vid.bus_count }}</td>
+              <td style="color: var(--color-truck); font-weight: 700; font-family: var(--font-mono);">{{ vid.truck_count }}</td>
+              <td style="color: var(--color-motorcycle); font-weight: 700; font-family: var(--font-mono);">{{ vid.motorcycle_count }}</td>
+              <td style="color: #fff; font-weight: 800; font-family: var(--font-mono);">{{ vid.overall_count }}</td>
+              <td>
+                {% if vid.status == 'COMPLETED' %}
+                  <span class="badge badge-completed">Completed</span>
+                {% elif vid.status == 'PROCESSING' %}
+                  <span class="badge badge-processing">Processing</span>
+                {% else %}
+                  <span class="badge badge-failed">Failed</span>
+                {% endif %}
+              </td>
+              <td style="color: #94a3b8; font-size: 0.85rem;">{{ vid.created_at|date:"M d, Y H:i" }}</td>
+              <td>
+                <div style="display: flex; gap: 0.5rem;">
+                  <a href="{% url 'results' pk=vid.pk %}" class="btn btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;">
+                    View
+                  </a>
+                  <a href="{% url 'delete_video' pk=vid.pk %}" class="btn btn-danger" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;">
+                    Delete
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 3rem; color: #94a3b8;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 1rem; color: #64748b;"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        <p style="font-size: 1.1rem; color: #fff;">No video analysis records found.</p>
+        <p style="font-size: 0.9rem; margin-top: 0.25rem;">Upload a traffic video to begin detection and tracking.</p>
+        <a href="{% url 'upload' %}" class="btn btn-primary" style="margin-top: 1.25rem;">Upload Video Now</a>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

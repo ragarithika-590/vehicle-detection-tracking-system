@@ -1,0 +1,39 @@
+{% extends 'detection/base.html' %}
+
+{% block title %}Register | Vehicle Detection System{% endblock %}
+
+{% block content %}
+<div style="max-width: 500px; margin: 2rem auto 0 auto;">
+  <div class="glass-card">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <h1 class="section-title" style="font-size: 1.8rem;">Create Account</h1>
+      <p style="color: #94a3b8; font-size: 0.9rem;">Register to access personal video analysis dashboards.</p>
+    </div>
+
+    <form method="post" id="registerForm">
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div class="form-group">
+          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.help_text %}
+            <small style="color: #64748b; font-size: 0.8rem; display: block; margin-top: 0.2rem;">{{ field.help_text }}</small>
+          {% endif %}
+          {% if field.errors %}
+            <div style="color: #fb7185; font-size: 0.85rem; margin-top: 0.25rem;">{{ field.errors.0 }}</div>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 1rem;" id="registerSubmitBtn">
+        Create Account & Get Started
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: #94a3b8;">
+      Already have an account? <a href="{% url 'login' %}" style="font-weight: 600;">Sign In</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

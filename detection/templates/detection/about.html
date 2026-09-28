@@ -1,0 +1,124 @@
+{% extends 'detection/base.html' %}
+{% load static %}
+
+{% block title %}About | Vehicle Detection & Tracking System{% endblock %}
+
+{% block content %}
+<div style="max-width: 1000px; margin: 0 auto;">
+  
+  <div style="text-align: center; margin-bottom: 3rem;">
+    <div class="hero-badge">Academic Project Documentation</div>
+    <h1 class="section-title" style="font-size: 2.75rem;">Vehicle Detection and Tracking System</h1>
+    <p class="section-subtitle">Comprehensive Technical Overview & System Specification</p>
+  </div>
+
+  <!-- 1. Executive Abstract -->
+  <div class="glass-card" style="margin-bottom: 2rem;">
+    <h2 style="font-size: 1.4rem; color: var(--accent-cyan); margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+      1. Abstract & Objective
+    </h2>
+    <p style="color: #cbd5e1; font-size: 1rem; line-height: 1.7;">
+      Automated traffic monitoring and vehicle counting are fundamental pillars of modern Intelligent Transportation Systems (ITS) and smart city infrastructure. Traditional manual traffic counting or sensor-loop systems are labor-intensive, costly, and prone to environmental degradation.
+    </p>
+    <p style="color: #cbd5e1; font-size: 1rem; line-height: 1.7; margin-top: 0.75rem;">
+      This project presents an end-to-end web-based computer vision solution built with <strong>Django</strong>, <strong>Ultralytics YOLOv8</strong>, <strong>ByteTrack</strong>, and <strong>OpenCV</strong>. The system processes uploaded traffic video streams, detects multi-class vehicles (<em>Car, Bus, Truck, Motorcycle</em>), tracks object trajectories across sequential frames to assign persistent IDs, and enforces strict duplicate-prevention logic to compute accurate traffic metrics saved in an SQLite database.
+    </p>
+  </div>
+
+  <!-- 2. Technical Architecture & Data Flow -->
+  <div class="glass-card" style="margin-bottom: 2rem;">
+    <h2 style="font-size: 1.4rem; color: var(--accent-emerald); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+      2. System Architecture & Processing Pipeline
+    </h2>
+    
+    <div style="background: rgba(15, 23, 42, 0.9); padding: 1.5rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); font-family: var(--font-mono); font-size: 0.85rem; color: #38bdf8; margin-bottom: 1.25rem; overflow-x: auto;">
+      User Browser  --->  Django Web App  --->  Video Upload Form<br>
+                                                       |<br>
+                                                       v<br>
+      SQLite DB  <---  Results Dashboard  <--- OpenCV VideoReader<br>
+                                                       |<br>
+                                                       v<br>
+      Annotated Output Video <--- Unique Count Filter <--- YOLOv8 + ByteTrack Tracking
+    </div>
+
+    <ul style="color: #cbd5e1; padding-left: 1.25rem; line-height: 1.8;">
+      <li><strong>YOLOv8 Detection:</strong> Uses a single-stage neural network to predict bounding boxes and class probabilities for <code>car</code>, <code>bus</code>, <code>truck</code>, and <code>motorcycle</code>.</li>
+      <li><strong>ByteTrack Multi-Object Tracking:</strong> Retains high-confidence and low-confidence detection boxes to solve trajectory breakage and visual occlusions.</li>
+      <li><strong>Duplicate Prevention Mechanism:</strong> Maintains a session hash map of <code>(vehicle_class, track_id)</code>. Each vehicle is counted exactly once when first tracked.</li>
+      <li><strong>OpenCV Video Writer:</strong> Draws colored bounding boxes, track ID labels, and real-time top-banner HUD counts directly onto output video frames.</li>
+    </ul>
+  </div>
+
+  <!-- 3. Hardware & Software Requirements -->
+  <div class="glass-card" style="margin-bottom: 2rem;">
+    <h2 style="font-size: 1.4rem; color: var(--accent-purple); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="15" x2="23" y2="15"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="15" x2="4" y2="15"></line></svg>
+      3. System Specifications
+    </h2>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+      <div style="background: rgba(15, 23, 42, 0.5); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <h3 style="color: var(--accent-cyan); font-size: 1.1rem; margin-bottom: 0.75rem;">Minimum Hardware</h3>
+        <ul style="color: #94a3b8; font-size: 0.9rem; line-height: 1.7; list-style: none;">
+          <li>• <strong>CPU:</strong> Intel Core i3 / AMD Ryzen 3 (Dual/Quad-core)</li>
+          <li>• <strong>RAM:</strong> 8 GB DDR4</li>
+          <li>• <strong>Storage:</strong> 2 GB available disk space</li>
+          <li>• <strong>OS:</strong> Windows 10/11 64-bit / Linux / macOS</li>
+        </ul>
+      </div>
+
+      <div style="background: rgba(15, 23, 42, 0.5); padding: 1.25rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <h3 style="color: var(--accent-emerald); font-size: 1.1rem; margin-bottom: 0.75rem;">Recommended Hardware</h3>
+        <ul style="color: #94a3b8; font-size: 0.9rem; line-height: 1.7; list-style: none;">
+          <li>• <strong>CPU:</strong> Intel Core i5/i7 or AMD Ryzen 5/7</li>
+          <li>• <strong>GPU:</strong> NVIDIA GTX 1660 / RTX Series (CUDA supported)</li>
+          <li>• <strong>RAM:</strong> 16 GB DDR4/DDR5</li>
+          <li>• <strong>Storage:</strong> SSD with 10 GB space</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Target Classes & Real-World Applications -->
+  <div class="glass-card" style="margin-bottom: 2rem;">
+    <h2 style="font-size: 1.4rem; color: var(--accent-amber); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+      4. Applications & Target Vehicle Classes
+    </h2>
+
+    <p style="color: #cbd5e1; margin-bottom: 1rem;">
+      The system is pre-configured to detect COCO dataset vehicle indices:
+    </p>
+
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; text-align: center;">
+      <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); padding: 1rem; border-radius: var(--radius-md);">
+        <div style="color: var(--color-car); font-weight: 800; font-size: 1.1rem;">CAR</div>
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #94a3b8;">COCO ID: 2</div>
+      </div>
+      <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); padding: 1rem; border-radius: var(--radius-md);">
+        <div style="color: var(--color-bus); font-weight: 800; font-size: 1.1rem;">BUS</div>
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #94a3b8;">COCO ID: 5</div>
+      </div>
+      <div style="background: rgba(168, 85, 247, 0.1); border: 1px solid rgba(168, 85, 247, 0.3); padding: 1rem; border-radius: var(--radius-md);">
+        <div style="color: var(--color-truck); font-weight: 800; font-size: 1.1rem;">TRUCK</div>
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #94a3b8;">COCO ID: 7</div>
+      </div>
+      <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); padding: 1rem; border-radius: var(--radius-md);">
+        <div style="color: var(--color-motorcycle); font-weight: 800; font-size: 1.1rem;">MOTORCYCLE</div>
+        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: #94a3b8;">COCO ID: 3</div>
+      </div>
+    </div>
+
+    <h3 style="color: #fff; font-size: 1.1rem; margin-bottom: 0.5rem;">Key Use Cases:</h3>
+    <ul style="color: #94a3b8; padding-left: 1.25rem; line-height: 1.7;">
+      <li><strong>Highway Traffic Volume Analysis:</strong> Automatic vehicle count monitoring during rush hours.</li>
+      <li><strong>Urban Infrastructure Planning:</strong> Evaluating road capacity requirements based on truck vs. car ratios.</li>
+      <li><strong>Toll Booth Automation:</strong> Classifying incoming vehicle types for dynamic fee calculation.</li>
+      <li><strong>Smart City Surveillance:</strong> Real-time anomaly and traffic density monitoring via webcam/CCTV feeds.</li>
+    </ul>
+  </div>
+
+</div>
+{% endblock %}

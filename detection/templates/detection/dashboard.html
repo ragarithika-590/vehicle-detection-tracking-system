@@ -1,0 +1,139 @@
+{% extends 'detection/base.html' %}
+{% load static %}
+
+{% block title %}User Dashboard | Vehicle Detection System{% endblock %}
+
+{% block content %}
+<div style="max-width: 1200px; margin: 0 auto;">
+  
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+    <div>
+      <h1 class="section-title">User Analytics Dashboard</h1>
+      <p class="section-subtitle">Welcome back, <strong>{{ user.username }}</strong>! Here is an overview of your vehicle analysis history.</p>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem;">
+      <a href="{% url 'upload' %}" class="btn btn-primary" id="dashboardUploadBtn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        New Video Analysis
+      </a>
+      <a href="{% url 'live_tracker' %}" class="btn btn-secondary">Live Tracker</a>
+    </div>
+  </div>
+
+  <!-- Metric Cards -->
+  <div class="stats-grid">
+    <div class="metric-card" style="--card-color: var(--accent-cyan);">
+      <div class="metric-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
+      </div>
+      <div>
+        <div class="metric-val">{{ total_videos }}</div>
+        <div class="metric-label">Total Videos Uploaded</div>
+      </div>
+    </div>
+
+    <div class="metric-card" style="--card-color: var(--color-car);">
+      <div class="metric-icon" style="color: var(--color-car);">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.8C2.0 10.9 2 11.1 2 11.3V16c0 .6.4 1 1 1h2"></path><circle cx="7" cy="17" r="2"></circle><path d="M9 17h6"></path><circle cx="17" cy="17" r="2"></circle></svg>
+      </div>
+      <div>
+        <div class="metric-val">{{ total_cars }}</div>
+        <div class="metric-label">Cars Counted</div>
+      </div>
+    </div>
+
+    <div class="metric-card" style="--card-color: var(--color-bus);">
+      <div class="metric-icon" style="color: var(--color-bus);">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="16" rx="2"></rect><path d="M4 11h16"></path><path d="M8 15h.01"></path><path d="M16 15h.01"></path><path d="M6 19v2"></path><path d="M18 19v2"></path></svg>
+      </div>
+      <div>
+        <div class="metric-val">{{ total_buses }}</div>
+        <div class="metric-label">Buses Counted</div>
+      </div>
+    </div>
+
+    <div class="metric-card" style="--card-color: var(--color-truck);">
+      <div class="metric-icon" style="color: var(--color-truck);">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+      </div>
+      <div>
+        <div class="metric-val">{{ total_trucks }}</div>
+        <div class="metric-label">Trucks Counted</div>
+      </div>
+    </div>
+
+    <div class="metric-card" style="--card-color: var(--color-motorcycle);">
+      <div class="metric-icon" style="color: var(--color-motorcycle);">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="5.5" cy="17.5" r="3.5"></circle><circle cx="18.5" cy="17.5" r="3.5"></circle><path d="M15 6h2l3 6.5M9 17.5l-3-6H3M12 9l-3 8.5"></path></svg>
+      </div>
+      <div>
+        <div class="metric-val">{{ total_motorcycles }}</div>
+        <div class="metric-label">Motorcycles Counted</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent User Videos -->
+  <div class="glass-card" style="margin-top: 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.3rem; color: #fff;">Your Recent Video Analyses</h2>
+      <a href="{% url 'history' %}" class="btn btn-secondary">View Full History</a>
+    </div>
+
+    {% if user_videos %}
+      <div class="table-container">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Cars</th>
+              <th>Buses</th>
+              <th>Trucks</th>
+              <th>Motorcycles</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for vid in user_videos %}
+            <tr>
+              <td>
+                <strong style="color: #fff;">{{ vid.title }}</strong><br>
+                <small style="color: #64748b;">{{ vid.created_at|date:"M d, Y H:i" }}</small>
+              </td>
+              <td style="color: var(--color-car); font-weight: 700; font-family: var(--font-mono);">{{ vid.car_count }}</td>
+              <td style="color: var(--color-bus); font-weight: 700; font-family: var(--font-mono);">{{ vid.bus_count }}</td>
+              <td style="color: var(--color-truck); font-weight: 700; font-family: var(--font-mono);">{{ vid.truck_count }}</td>
+              <td style="color: var(--color-motorcycle); font-weight: 700; font-family: var(--font-mono);">{{ vid.motorcycle_count }}</td>
+              <td style="color: #fff; font-weight: 800; font-family: var(--font-mono);">{{ vid.overall_count }}</td>
+              <td>
+                {% if vid.status == 'COMPLETED' %}
+                  <span class="badge badge-completed">Completed</span>
+                {% elif vid.status == 'PROCESSING' %}
+                  <span class="badge badge-processing">Processing</span>
+                {% else %}
+                  <span class="badge badge-failed">Failed</span>
+                {% endif %}
+              </td>
+              <td>
+                <a href="{% url 'results' pk=vid.pk %}" class="btn btn-secondary" style="padding: 0.35rem 0.65rem; font-size: 0.8rem;">
+                  View Results
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 2.5rem; color: #94a3b8;">
+        <p style="font-size: 1.05rem; color: #fff;">You haven't uploaded any videos yet.</p>
+        <a href="{% url 'upload' %}" class="btn btn-primary" style="margin-top: 1rem;">Upload Your First Video</a>
+      </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}

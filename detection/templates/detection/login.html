@@ -1,0 +1,36 @@
+{% extends 'detection/base.html' %}
+
+{% block title %}Login | Vehicle Detection System{% endblock %}
+
+{% block content %}
+<div style="max-width: 440px; margin: 3rem auto 0 auto;">
+  <div class="glass-card">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <h1 class="section-title" style="font-size: 1.8rem;">Account Login</h1>
+      <p style="color: #94a3b8; font-size: 0.9rem;">Sign in to save and manage your vehicle detection records.</p>
+    </div>
+
+    <form method="post" id="loginForm">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="id_username" class="form-label">Username</label>
+        <input type="text" name="username" id="id_username" class="form-control" placeholder="Enter your username" required autofocus>
+      </div>
+
+      <div class="form-group">
+        <label for="id_password" class="form-label">Password</label>
+        <input type="password" name="password" id="id_password" class="form-control" placeholder="Enter your password" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 1rem;" id="loginSubmitBtn">
+        Sign In
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.9rem; color: #94a3b8;">
+      Don't have an account? <a href="{% url 'register' %}" style="font-weight: 600;">Create One Now</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

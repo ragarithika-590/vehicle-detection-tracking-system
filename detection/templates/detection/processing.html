@@ -1,0 +1,165 @@
+{% extends 'detection/base.html' %}
+{% load static %}
+
+{% block title %}Processing Video... | Vehicle Detection System{% endblock %}
+
+{% block content %}
+<div style="max-width: 850px; margin: 2rem auto;">
+  
+  <div style="text-align: center; margin-bottom: 2rem;">
+    <div class="hero-badge" style="background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.3); color: #fbbf24; animation: pulse 2s infinite;">
+      ● AI Inference & Tracking In Progress
+    </div>
+    <h1 class="section-title">Processing Your Video</h1>
+    <p class="section-subtitle">YOLOv8s vehicle detection & ByteTrack trajectory tracking pipeline</p>
+  </div>
+
+  <div class="glass-card" id="processingCard">
+    <!-- Progress Bar Section -->
+    <div style="margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem; font-weight: 700;">
+        <span style="color: #cbd5e1;" id="statusLabelText">Analyzing Video Frames...</span>
+        <span style="color: var(--accent-cyan); font-family: var(--font-mono); font-size: 1.25rem;" id="progressPercentage">0%</span>
+      </div>
+
+      <div style="width: 100%; height: 16px; background: rgba(15, 23, 42, 0.9); border-radius: 9999px; overflow: hidden; border: 1px solid var(--border-color); padding: 2px;">
+        <div id="progressBarFill" style="width: 0%; height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue)); border-radius: 9999px; transition: width 0.4s ease;"></div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; margin-top: 0.5rem; font-size: 0.85rem; color: #94a3b8;">
+        <span>Video: <strong>{{ record.title }}</strong></span>
+        <span id="frameProgressText">Frames: 0 / {{ record.total_frames|default:"..." }}</span>
+      </div>
+    </div>
+
+    <!-- Live Category Detection Counter Previews -->
+    <div style="background: rgba(15, 23, 42, 0.6); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 2rem;">
+      <h3 style="font-size: 1rem; color: #fff; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">Live Detections Preview</h3>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; text-align: center;">
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.2); padding: 0.75rem; border-radius: var(--radius-md);">
+          <span style="color: #94a3b8; font-size: 0.8rem; display: block;">CARS</span>
+          <strong style="color: var(--color-car); font-size: 1.5rem; font-family: var(--font-mono);" id="liveCarCount">0</strong>
+        </div>
+        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); padding: 0.75rem; border-radius: var(--radius-md);">
+          <span style="color: #94a3b8; font-size: 0.8rem; display: block;">BUSES</span>
+          <strong style="color: var(--color-bus); font-size: 1.5rem; font-family: var(--font-mono);" id="liveBusCount">0</strong>
+        </div>
+        <div style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.2); padding: 0.75rem; border-radius: var(--radius-md);">
+          <span style="color: #94a3b8; font-size: 0.8rem; display: block;">TRUCKS</span>
+          <strong style="color: var(--color-truck); font-size: 1.5rem; font-family: var(--font-mono);" id="liveTruckCount">0</strong>
+        </div>
+        <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); padding: 0.75rem; border-radius: var(--radius-md);">
+          <span style="color: #94a3b8; font-size: 0.8rem; display: block;">MOTORCYCLES</span>
+          <strong style="color: var(--color-motorcycle); font-size: 1.5rem; font-family: var(--font-mono);" id="liveMotorcycleCount">0</strong>
+        </div>
+        <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-color); padding: 0.75rem; border-radius: var(--radius-md);">
+          <span style="color: #94a3b8; font-size: 0.8rem; display: block;">TOTAL</span>
+          <strong style="color: #fff; font-size: 1.5rem; font-family: var(--font-mono);" id="liveOverallCount">0</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Container (Hidden by default) -->
+    <div id="errorContainer" style="display: none; background: rgba(244, 63, 94, 0.12); border: 1px solid rgba(244, 63, 94, 0.3); padding: 1.5rem; border-radius: var(--radius-md); margin-top: 1.5rem; color: #fb7185;">
+      <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem; color: #fff;">Processing Failed</h3>
+      <p id="errorMessageText" style="font-size: 0.95rem; margin-bottom: 1.25rem;">An error occurred while processing the video.</p>
+      <a href="{% url 'upload' %}" class="btn btn-primary">Try Another Video</a>
+    </div>
+
+    <!-- Friendly Instruction Notice -->
+    <p style="text-align: center; color: #94a3b8; font-size: 0.9rem; margin-top: 1rem;" id="keepOpenNotice">
+      Please keep this page open. Processing is running in the background and will automatically redirect to results once complete.
+    </p>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  const recordPk = "{{ record.pk }}";
+  const statusApiUrl = "{% url 'processing_status_api' pk=record.pk %}";
+  
+  const progressBarFill = document.getElementById('progressBarFill');
+  const progressPercentage = document.getElementById('progressPercentage');
+  const frameProgressText = document.getElementById('frameProgressText');
+  const statusLabelText = document.getElementById('statusLabelText');
+  const liveCarCount = document.getElementById('liveCarCount');
+  const liveBusCount = document.getElementById('liveBusCount');
+  const liveTruckCount = document.getElementById('liveTruckCount');
+  const liveMotorcycleCount = document.getElementById('liveMotorcycleCount');
+  const liveOverallCount = document.getElementById('liveOverallCount');
+  const errorContainer = document.getElementById('errorContainer');
+  const errorMessageText = document.getElementById('errorMessageText');
+  const keepOpenNotice = document.getElementById('keepOpenNotice');
+
+  let pollInterval = null;
+
+  function checkStatus() {
+    fetch(statusApiUrl, {
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Server returned HTTP ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      // Update UI elements
+      const pct = Math.min(100, Math.max(0, data.progress || 0));
+      progressBarFill.style.width = pct + '%';
+      progressPercentage.textContent = pct + '%';
+      
+      if (data.total_frames && data.total_frames > 0) {
+        frameProgressText.textContent = `Frames: ${data.current_frame || 0} / ${data.total_frames}`;
+      } else {
+        frameProgressText.textContent = `Processing frames...`;
+      }
+
+      liveCarCount.textContent = data.car_count || 0;
+      liveBusCount.textContent = data.bus_count || 0;
+      liveTruckCount.textContent = data.truck_count || 0;
+      liveMotorcycleCount.textContent = data.motorcycle_count || 0;
+      liveOverallCount.textContent = data.overall_count || 0;
+
+      if (data.status === 'COMPLETED') {
+        clearInterval(pollInterval);
+        progressBarFill.style.width = '100%';
+        progressPercentage.textContent = '100%';
+        statusLabelText.textContent = 'Processing Complete! Redirecting to results...';
+        statusLabelText.style.color = '#34d399';
+        setTimeout(() => {
+          window.location.href = data.results_url;
+        }, 800);
+      } else if (data.status === 'FAILED') {
+        clearInterval(pollInterval);
+        statusLabelText.textContent = 'Processing Failed';
+        statusLabelText.style.color = '#fb7185';
+        errorMessageText.textContent = data.error_message || 'An unknown error occurred during video processing.';
+        errorContainer.style.display = 'block';
+        keepOpenNotice.style.display = 'none';
+      }
+    })
+    .catch(err => {
+      console.warn("Status poll warning:", err);
+    });
+  }
+
+  // Start polling every 1.5 seconds
+  checkStatus();
+  pollInterval = setInterval(checkStatus, 1500);
+</script>
+
+<style>
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
+}
+</style>
+{% endblock %}

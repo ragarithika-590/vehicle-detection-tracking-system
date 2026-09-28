@@ -1,0 +1,24 @@
+{% extends 'detection/base.html' %}
+
+{% block title %}Confirm Delete - {{ record.title }}{% endblock %}
+
+{% block content %}
+<div style="max-width: 600px; margin: 3rem auto 0 auto;">
+  <div class="glass-card" style="border-color: rgba(244, 63, 94, 0.4);">
+    <div style="color: var(--accent-rose); margin-bottom: 1rem; text-align: center;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+    </div>
+
+    <h2 style="font-size: 1.5rem; text-align: center; color: #fff; margin-bottom: 0.5rem;">Delete Video Record?</h2>
+    <p style="text-align: center; color: #94a3b8; margin-bottom: 1.5rem;">
+      Are you sure you want to permanently delete <strong>"{{ record.title }}"</strong>? This action will remove the record and associated media files from storage.
+    </p>
+
+    <form method="post" style="display: flex; gap: 1rem; justify-content: center;">
+      {% csrf_token %}
+      <a href="{% url 'history' %}" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-danger">Confirm Delete</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
